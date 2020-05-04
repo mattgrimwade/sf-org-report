@@ -61,6 +61,10 @@ app.prepare()
     const httpServer = http.createServer(server);
     const httpsServer = https.createServer(credentials, server);
 
+    httpServer.listen(HTTP_PORT, () => {
+        console.log(`😎 Server is listening on port ${HTTP_PORT}`);
+    });
+    
     httpsServer.listen(HTTPS_PORT, () => {
         console.log(`😎 Server is listening on port ${HTTPS_PORT}`);
     }); 

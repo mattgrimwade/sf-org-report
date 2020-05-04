@@ -21,7 +21,7 @@ const credentials = {key: privateKey, cert: certificate};
 //routers
 const orgReportRouter = require('./server/routers/org-report-router');
 
-const redisClient = Redis.createClient();
+const redisClient = Redis.createClient(process.env.REDIS_URL);
 redisClient.on("error", function(error) {
     console.error(error);
 });

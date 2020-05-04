@@ -14,7 +14,6 @@ const Redis = require('redis');
 const uuid = require('uuid/v4');
 
 const HTTPS_PORT = process.env.PORT || 3006;
-const HTTP_PORT = process.env.PORT || 3000;
 const privateKey = fs.readFileSync(path.resolve('./sslcert/server.key'));
 const certificate = fs.readFileSync(path.resolve('./sslcert/server.cert'));
 const credentials = {key: privateKey, cert: certificate};
@@ -62,9 +61,6 @@ app.prepare()
     const httpServer = http.createServer(server);
     const httpsServer = https.createServer(credentials, server);
 
-    httpServer.listen(HTTP_PORT, () => {
-        console.log(`😎 Server is listening on port ${HTTP_PORT}`);
-    });
     httpsServer.listen(HTTPS_PORT, () => {
         console.log(`😎 Server is listening on port ${HTTPS_PORT}`);
     }); 

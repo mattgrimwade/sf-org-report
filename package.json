@@ -1,0 +1,25 @@
+{
+  "name": "oat-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' node server.js",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "connect-redis": "^4.0.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "js-cookie": "^2.2.1",
+    "jsforce": "^1.9.3",
+    "next": "9.3.5",
+    "react": "16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-dom": "16.13.1",
+    "redis": "^3.0.2",
+    "uuid": "^7.0.3"
+  }
+}

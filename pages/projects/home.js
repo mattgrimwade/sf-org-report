@@ -7,7 +7,7 @@ import Router from 'next/router'
 
 export default function Home() {
 
-    const launchOrgReport = () => {Router.push('/org-report/')};
+    const launchOrgReport = () => {Router.push('/projects/org-report/')};
 
     return (
         <Layout>
@@ -27,12 +27,3 @@ export default function Home() {
         </Layout>
     );
 }
-
-export async function getServerSideProps(context) {
-    console.log('home');
-    
-    return {
-        props : {}
-    };
-}
-

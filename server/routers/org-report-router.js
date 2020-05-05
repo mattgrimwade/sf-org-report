@@ -12,14 +12,13 @@ const orgReportRouter = function(app) {
 } 
 
 function authenticateUser(app, req, res, next) {
-    console.log('validating user');
     console.log('path ' + req.path);
-
     if (req.param('code')) {
         handleOAuthCallback(app, req, res, next);
     }
     else if (validateUserAuthenticated(req)) {
-        next();
+        //if we're authenticated then render the configurator page
+        return app.render(req, res, '/projects/org-report/metadata-report-configurator')
     }
     else {
         return res.redirect(oauth2.getAuthorizationUrl({ scope : 'api id web' }))

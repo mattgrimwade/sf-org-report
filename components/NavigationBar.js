@@ -17,13 +17,6 @@ export default function NavigationBar({authenticated, sfOrgUrl}) {
                 <Link href="/projects/home" >
                     <Nav.Link href="#dummy">Projects</Nav.Link>
                 </Link>
-                {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-                </NavDropdown> */}
             </Nav>
             <AuthenticatedText authenticated={authenticated} url={sfOrgUrl}/>
             </Navbar.Collapse>
@@ -33,27 +26,18 @@ export default function NavigationBar({authenticated, sfOrgUrl}) {
 
 function AuthenticatedText(props) {
     if (props.authenticated) {
-        return (
-            <Navbar.Text>
-                Signed in to: {props.url}
-            </Navbar.Text>
-        )
+        return <Navbar.Text>Signed in to: {props.url}</Navbar.Text>;
     }
 
     return null;
 }
 
 export async function getServerSideProps(context) {
-    console.log('navbar');
-    console.log('navbar sessionId ' + context.req.sessionId);
-    console.log('navbar sessionId ' + context.req.sessionId);
-
     const authenticated = false;
     if (context.req.session && context.req.session.accessToken && context.req.session.instanceUrl)
     {
         authenticated = true;
     }
-    console.log('navbar authenticated ' + authenticated);
 
     return {
         props : {

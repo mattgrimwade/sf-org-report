@@ -45,8 +45,7 @@ export default class MetadataSelector extends React.Component {
             this.setState({expanded: !this.state.expanded});
         }
         else {
-            this.setState({expanded: !this.state.expanded,
-                           loading: true});
+            this.setState({expanded: !this.state.expanded, loading: true});
             this.fetchMetadata();
         }
     }
@@ -56,31 +55,32 @@ export default class MetadataSelector extends React.Component {
     }
 
     buildTableProps() {
-        const tableProps = {};
         const { type } = this.props.metadata; 
-        tableProps.columns = selectorColumnHeadersByType[type];
-        tableProps.previouslySelectedIds = {};
-        tableProps.rows = this.props.metadata.records.map(record => buildSelectorRowForType.call(tableProps, type, record, this.getSelectedRecordsFromLocalStorage(type)));
-        tableProps.selector = true;
-        tableProps.key = type;
-        tableProps.type = type;
-        tableProps.setParentSelectedRows = async selectedIds => {
-            this.selectedIds = selectedIds
-            const selectedRecords = []; 
-            this.props.metadata.records.forEach(record => {
-                //todo make this work off some kind of fixed id field
-                if (record.Id in selectedIds) {
-                    selectedRecords.push(record);
-                }
-            }) 
-            //send up to the main parent component
-            this.props.selectRecordsForType(type, selectedRecords);
-        }
+        const tableProps = {
+            columns: selectorColumnHeadersByType[type],
+            previouslySelectedIds : {},
+            selector : true,
+            key : type,
+            type : type,
+            setParentSelectedRows : async selectedIds => {
+                this.selectedIds = selectedIds
+                const selectedRecords = []; 
+                this.props.metadata.records.forEach(record => {
+                    if (record.Id in selectedIds) {
+                        selectedRecords.push(record);
+                    }
+                }) 
+                //send up to the main parent component
+                this.props.selectRecordsForType(type, selectedRecords);
+            }
+    
+        };
+        tableProps.rows = this.props.metadata.records.map(record => buildSelectorRowForType.call(tableProps, record, this.getSelectedRecordsFromLocalStorage(type)));
+
         return tableProps;
     }
 
     render() {
-        console.log('render metadataselector')
         return (
             <Row className={`${styles.parent} border my-2 p-1`}>
                 <Container>

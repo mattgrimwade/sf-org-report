@@ -14,7 +14,7 @@ const Redis = require('redis');
 const uuid = require('uuid/v4');
 
 const HTTP_PORT = process.env.PORT || 3000;
-// const HTTPS_PORT = process.env.PORT || 3006;
+const HTTPS_PORT = process.env.PORT || 3006;
 const privateKey = fs.readFileSync(path.resolve('./sslcert/server.key'));
 const certificate = fs.readFileSync(path.resolve('./sslcert/server.cert'));
 const credentials = {key: privateKey, cert: certificate};
@@ -27,6 +27,7 @@ redisClient.on("error", function(error) {
     console.error(error);
 });
 
+//clear the redis DB on server start (runs as independent process even though its an in memory store)
 redisClient.flushall( function (err, succeeded) {
     console.log('flushed redis ' + succeeded); 
 });
@@ -49,11 +50,8 @@ app.prepare()
         store: new RedisStore({ client: redisClient }),
         secret: '343ji43j4n3jn4jk3n'
     }));
-      
-    // server.all('/proxy/?*', jsforceAjaxProxy({ enableCORS: true }));
-    // server.use((req,res,next) => {console.log('path ' + req.path); next();});
 
-    server.use('/org-report/*', orgReportRouter(app));
+    server.use('/projects/org-report/*', orgReportRouter(app));
     
     server.all('*', (req, res) => {
         return handle(req, res)
@@ -62,13 +60,16 @@ app.prepare()
     const httpServer = http.createServer(server);
     const httpsServer = https.createServer(credentials, server);
 
-    httpServer.listen(HTTP_PORT, () => {
-        console.log(`😎 Server is listening on port ${HTTP_PORT}`);
-    });
-
-    // httpsServer.listen(HTTPS_PORT, () => {
-    //     console.log(`😎 Server is listening on port ${HTTPS_PORT}`);
-    // }); 
+    //SF oauth requires https. However if we're on heroku then they provide that for us.
+    if (dev) {
+        httpsServer.listen(HTTPS_PORT, () => {
+            console.log(`😎 Server is listening on port ${HTTPS_PORT}`);
+        }); 
+    } else {
+        httpServer.listen(HTTP_PORT, () => {
+            console.log(`😎 Server is listening on port ${HTTP_PORT}`);
+        });
+    }
 })
 .catch((ex) => {
   console.error(ex.stack)

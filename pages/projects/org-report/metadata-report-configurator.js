@@ -65,7 +65,7 @@ export default class OrgReport extends React.Component {
     }
 
     /*
-        Load the previous selections from local storage
+        Load the previous selections from local storage - obviously need to do client side
     */
     componentDidMount() {
         this.selectedRecordsByType = localStorage.getItem('selectedRecords') ? JSON.parse(localStorage.getItem('selectedRecords')) : {};
@@ -88,6 +88,7 @@ export default class OrgReport extends React.Component {
                     {metadataTypes.map( (metadataType, index) => {
                         const columns = reportColumnHeadersByType[metadataType];
                         const rows = this.state.selectedRecordsByType[metadataType].map(record => buildReportRowForType(metadataType, record));
+
                         const props = {rows, columns, key: index, selector: false};
                         return rows && rows.length > 0 ? <MetadataTable {...props} /> : null;
                     })}
@@ -99,6 +100,7 @@ export default class OrgReport extends React.Component {
 
     hideReport = () => this.setState({showReport: false});
 
+    //todo..
     logoutFromOrg = () => {
 
     }

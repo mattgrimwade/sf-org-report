@@ -81,13 +81,14 @@ export default class OrgReport extends React.Component {
     }
 
     getMetadataReport() {
-        const metadataTypes = Object.keys(this.state.selectedRecordsByType);
+        const { selectedRecordsByType } = this.state;
+        const metadataTypes = Object.keys(selectedRecordsByType);
         return (
             <>
                 <Col>
                     {metadataTypes.map( (metadataType, index) => {
                         const columns = reportColumnHeadersByType[metadataType];
-                        const rows = this.state.selectedRecordsByType[metadataType].map(record => buildReportRowForType(metadataType, record));
+                        const rows = selectedRecordsByType[metadataType].map(record => buildReportRowForType(metadataType, record));
 
                         const props = {rows, columns, key: index, selector: false};
                         return rows && rows.length > 0 ? <MetadataTable {...props} /> : null;
@@ -107,8 +108,9 @@ export default class OrgReport extends React.Component {
     
     render() {
         const { instanceUrl } = this.props;
-        const content = this.state.showReport ? this.getMetadataReport() : this.getMetadataConfigurator(); 
-
+        const { showReport } = this.state;
+        const content = showReport ? this.getMetadataReport() : this.getMetadataConfigurator(); 
+        
         return (
             <Layout>
                 <Head>

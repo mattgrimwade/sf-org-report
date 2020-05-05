@@ -27,18 +27,6 @@ export default class MetadataSelector extends React.Component {
         });
     }
 
-    showIfExpanded() {
-        return this.state.expanded ? '' : 'd-none';
-    }
-
-    showIfLoaded() {
-        return this.state.loadedRecords ? '' : 'd-none';
-    }
-
-    showIfCollapsed() {
-        return this.state.expanded ? 'd-none' : '';
-    }
-
     toggleMetadata = (event) => {
         if (this.state.loadedRecords)
         {
@@ -55,7 +43,7 @@ export default class MetadataSelector extends React.Component {
     }
 
     buildTableProps() {
-        const { type } = this.props.metadata; 
+        const { records, type } = this.props.metadata; 
         const tableProps = {
             columns: selectorColumnHeadersByType[type],
             previouslySelectedIds : {},
@@ -65,7 +53,7 @@ export default class MetadataSelector extends React.Component {
             setParentSelectedRows : async selectedIds => {
                 this.selectedIds = selectedIds
                 const selectedRecords = []; 
-                this.props.metadata.records.forEach(record => {
+                records.forEach(record => {
                     if (record.Id in selectedIds) {
                         selectedRecords.push(record);
                     }
@@ -75,27 +63,30 @@ export default class MetadataSelector extends React.Component {
             }
     
         };
-        tableProps.rows = this.props.metadata.records.map(record => buildSelectorRowForType.call(tableProps, record, this.getSelectedRecordsFromLocalStorage(type)));
+        tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record, this.getSelectedRecordsFromLocalStorage(type)));
 
         return tableProps;
     }
 
     render() {
+        const { expanded, loading, loadedRecords, tableProps } = this.state;
+        const { type } = this.props.metadata;
+
         return (
             <Row className={`${styles.parent} border my-2 p-1`}>
                 <Container>
                     <Col>
-                        <Row disabled={this.state.loading} onClick={this.toggleMetadata}>  
-                        <i className={`fa fa-caret-right mt-1 mr-1 ${this.showIfCollapsed()}`} aria-hidden="true"></i>
-                        <i className={`fa fa-caret-down mt-1 mr-1 ${this.showIfExpanded()}`} aria-hidden="true"></i>
-                                {this.props.metadata.type}
-                        <Spinner className={`${styles.spinner} mt-1 ml-1`} data-loading={this.state.loading} animation="border" role="status" size="sm">
+                        <Row disabled={loading} onClick={this.toggleMetadata}>  
+                        <i className={`fa fa-caret-right mt-1 mr-1 ${expanded ? 'd-none' : ''}`} aria-hidden="true"></i>
+                        <i className={`fa fa-caret-down mt-1 mr-1 ${expanded ? '' : 'd-none'}`} aria-hidden="true"></i>
+                                {type}
+                        <Spinner className={`${styles.spinner} mt-1 ml-1`} data-loading={loading} animation="border" role="status" size="sm">
                             <span className="sr-only">Loading...</span>
                         </Spinner>
                         
                         </Row>
-                        <Col className={`${this.showIfExpanded()} ${this.showIfLoaded()}`}>
-                            <MetadataTable {...this.state.tableProps} />
+                        <Col className={`${(expanded && loadedRecords) ? '' : 'd-none'}`}>
+                            <MetadataTable {...tableProps} />
                         </Col>
                     </Col>
                 </Container>

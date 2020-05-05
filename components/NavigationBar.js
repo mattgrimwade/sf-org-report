@@ -1,8 +1,7 @@
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import NavDropdown from 'react-bootstrap/NavDropdown'
-import Button from 'react-bootstrap/Button'
 import Link from 'next/link';
+import { navLinks } from '../lib/utils';
 
 export default function NavigationBar({authenticated, sfOrgUrl}) {
     return (
@@ -11,30 +10,20 @@ export default function NavigationBar({authenticated, sfOrgUrl}) {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
-                <Link href="/index" >
-                    <Nav.Link href="#dummy">Home</Nav.Link>
-                </Link>
-                <Link href="/projects/home" >
-                    <Nav.Link href="#dummy">Projects</Nav.Link>
-                </Link>
+                {navLinks.map((navLink, index) =>   <Link key={index} href={navLink.url} >
+                                                        <Nav.Link href="#dummy">{navLink.label}</Nav.Link>
+                                                    </Link>)}
             </Nav>
-            <AuthenticatedText authenticated={authenticated} url={sfOrgUrl}/>
+            {authenticated && <Navbar.Text>Signed in to: {sfOrgUrl}</Navbar.Text>}
             </Navbar.Collapse>
         </Navbar>
     )
 }
 
-function AuthenticatedText(props) {
-    if (props.authenticated) {
-        return <Navbar.Text>Signed in to: {props.url}</Navbar.Text>;
-    }
-
-    return null;
-}
-
-export async function getServerSideProps(context) {
+export async function getServerSideProps({req}) {
+    const { session } = req;
     const authenticated = false;
-    if (context.req.session && context.req.session.accessToken && context.req.session.instanceUrl)
+    if (session && session.accessToken && session.instanceUrl)
     {
         authenticated = true;
     }
@@ -42,7 +31,7 @@ export async function getServerSideProps(context) {
     return {
         props : {
             authenticated : authenticated,
-            sfOrgUrl : context.req.session.instanceUrl
+            sfOrgUrl : session.instanceUrl
         }
     }
 }

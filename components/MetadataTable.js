@@ -61,13 +61,9 @@ function DataRow({updateSelection, defaultSelected, selected, cells, rowIndex, s
             {showSelector && <td><input onChange={() => updateSelection(rowIndex)} checked={selected} value={selected} type="checkbox" id={`checkBox_${rowIndex}_${type}`}/>
                                 <label for={`checkBox_${rowIndex}_${type}`} /></td>}
             
-            {cells.map(cellData => <DataCell {...cellData}/> )}
+            {cells.map(cellData => <td>{cellData.value}</td>)}
         </tr>
     );
-}
-
-function DataCell({value}) {
-    return <td>{value}</td>
 }
 
 function updateSelectedRow(rowKey, {rows, selectedIds, allSelected, indeterminateSelectAll, 

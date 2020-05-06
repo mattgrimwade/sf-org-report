@@ -63,7 +63,6 @@ export default class MetadataSelector extends React.Component {
     
         };
         tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record));
-        tableProps.previouslySelectedIds = getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type), tableProps.rows);
 
         return tableProps;
     }
@@ -86,7 +85,7 @@ export default class MetadataSelector extends React.Component {
                         
                         </Row>
                         <Col className={`${(expanded && loadedRecords) ? '' : 'd-none'}`}>
-                            <MetadataTable {...tableProps} />
+                            <MetadataTable {...tableProps} previouslySelectedIds={() => getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type), tableProps.rows)} />
                         </Col>
                     </Col>
                 </Container>

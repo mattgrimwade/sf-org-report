@@ -6,11 +6,10 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
     const [allSelected, setAllSelected] = React.useState(false);
     const selectAllCheckboxRef = React.useRef(null);
 
-    const updateSelected = (rowKey) => {
-        const row = rows[rowKey]
-        selectedIds[row.id] = !selectedIds[row.id]
-
-        setSelectedIds(Object.assign({}, selectedIds));
+    const updateSelected = (rowId) => {
+        console.log('previouslySelectedIds ', previouslySelectedIds());
+        console.log('selectedIds ', selectedIds);
+        setSelectedIds({ ...selectedIds, [rowId]: !selectedIds[rowId]})       
         setParentSelectedRows(selectedIds);    
     }
 
@@ -26,8 +25,8 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
     }
 
     React.useEffect(() => {
-        setSelectedIds(previouslySelectedIds);
-    },[previouslySelectedIds]);
+        setSelectedIds(previouslySelectedIds());
+    },[]);
 
     return (
         <table className={`${styles.parent} mt-5 w-100`}>
@@ -50,15 +49,15 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
                 {rows.map((row, index) => 
                     <tr key={index} className="py-3">     
                         {selector && (
-                            <td><input onChange={() => updateSelected(index)} 
-                                                    checked={selectedIds[row.id]}
+                            <td><input onChange={() => updateSelected(row.id)} 
+                                                    checked={selectedIds && selectedIds[row.id]}
                                                     value={row.defaultSelected} 
                                                     type="checkbox" 
                                                     id={`checkBox_${index}_${type}`}/>
                                 <label for={`checkBox_${index}_${type}`} />
                             </td>
                         )}
-                        {cells.map(cell => (
+                        {row.cells.map(cell => (
                             <td>{cell.value}</td>
                         ))}
                     </tr>

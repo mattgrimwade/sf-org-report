@@ -46,7 +46,6 @@ export default class MetadataSelector extends React.Component {
         const { records, type } = this.props.metadata; 
         const tableProps = {
             columns: selectorColumnHeadersByType[type],
-            previouslySelectedIds : {},
             selector : true,
             key : type,
             type : type,
@@ -54,7 +53,7 @@ export default class MetadataSelector extends React.Component {
                 this.selectedIds = selectedIds
                 const selectedRecords = []; 
                 records.forEach(record => {
-                    if (record.Id in selectedIds) {
+                    if (selectedIds[record.Id]) {
                         selectedRecords.push(record);
                     }
                 }) 
@@ -63,7 +62,8 @@ export default class MetadataSelector extends React.Component {
             }
     
         };
-        tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record, this.getSelectedRecordsFromLocalStorage(type)));
+        tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record));
+        previouslySelectedIds : getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type));
 
         return tableProps;
     }

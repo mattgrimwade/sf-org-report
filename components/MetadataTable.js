@@ -2,25 +2,13 @@
 import styles from './MetadataTable.module.css';
 
 function MetadataTable({columns, rows, selector, setParentSelectedRows, previouslySelectedIds, type}) {
-    const [showSelector, setShowSelector] = React.useState(selector);
     const [selectedIds, setSelectedIds] = React.useState({});
     const [allSelected, setAllSelected] = React.useState(false);
-    const [indeterminateSelectAll, setIndeterminateSelectAll] = React.useState(false);
     const selectAllCheckboxRef = React.useRef(null);
 
     const updateSelected = (rowKey) => {
         const row = rows[rowKey]
-        const subjectId = row.id;
-    
-        if (selectedIds[subjectId]) 
-            delete selectedIds[subjectId]; 
-        else 
-            selectedIds[subjectId] = true;
-        
-        const currentSelected = row.selected == null ? row.defaultSelected : row.selected;
-        rows[rowKey].selected = !currentSelected;
-        
-        if (allSelected && indeterminateSelectAll === false) setIndeterminateSelectAll(true);
+        selectedIds[row.id] = !selectedIds[row.id]
 
         setSelectedIds(Object.assign({}, selectedIds));
         setParentSelectedRows(selectedIds);    
@@ -29,21 +17,13 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
     const selectAll = () => {
         rows.forEach(row => {
             row.selected = !allSelected; 
-            if (allSelected) 
-                deleteSelectedIds[row.id]; 
-            else 
-                selectedIds[row.id] = true;
+            selectedIds[row.id] = !allSelected;
         });
 
-        setIndeterminateSelectAll(false);
         setSelectedIds(selectedIds);
         setParentSelectedRows(selectedIds);    
         setAllSelected(!allSelected);    
     }
-
-    React.useEffect(() => {
-        if (showSelector) selectAllCheckboxRef.current.indeterminate = indeterminateSelectAll;
-    },[indeterminateSelectAll]);
 
     React.useEffect(() => {
         setSelectedIds(previouslySelectedIds);
@@ -53,7 +33,7 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
         <table className={`${styles.parent} mt-5 w-100`}>
             <thead>
                 <tr>
-                    {showSelector && (
+                    {selector && (
                         <th><input ref={selectAllCheckboxRef} 
                                                 onChange={selectAll} 
                                                 type="checkbox" 
@@ -69,17 +49,17 @@ function MetadataTable({columns, rows, selector, setParentSelectedRows, previous
             <tbody>
                 {rows.map((row, index) => 
                     <tr key={index} className="py-3">     
-                        {showSelector && (
+                        {selector && (
                             <td><input onChange={() => updateSelected(index)} 
-                                                    checked={row.selected == null ? row.defaultSelected : row.selected}
+                                                    checked={selectedIds[row.id]}
                                                     value={row.defaultSelected} 
                                                     type="checkbox" 
                                                     id={`checkBox_${index}_${type}`}/>
                                 <label for={`checkBox_${index}_${type}`} />
                             </td>
                         )}
-                        {cells.map(cellData => (
-                            <td>{cellData.value}</td>
+                        {cells.map(cell => (
+                            <td>{cell.value}</td>
                         ))}
                     </tr>
                 )}                

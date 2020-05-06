@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Spinner from 'react-bootstrap/Spinner';
 import styles from './MetadataSelector.module.css';
 import MetadataTable from './MetadataTable';
-import { selectorColumnHeadersByType, buildSelectorRowForType } from '../lib/metadata-params';
+import { selectorColumnHeadersByType, buildSelectorRowForType, getSelectedRecords } from '../lib/metadata-params';
 
 export default class MetadataSelector extends React.Component {
     constructor(props) {
@@ -63,7 +63,7 @@ export default class MetadataSelector extends React.Component {
     
         };
         tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record));
-        previouslySelectedIds : getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type));
+        tableProps.previouslySelectedIds = getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type), tableProps.rows);
 
         return tableProps;
     }

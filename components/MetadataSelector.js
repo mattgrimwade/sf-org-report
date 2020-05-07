@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Spinner from 'react-bootstrap/Spinner';
 import styles from './MetadataSelector.module.css';
 import MetadataTable from './MetadataTable';
-import { selectorColumnHeadersByType, buildSelectorRowForType, getSelectedRecords } from '../lib/metadata-params';
+import { selectorColumnHeadersByType, buildSelectorRowForType } from '../lib/metadata-params';
 
 export default class MetadataSelector extends React.Component {
     constructor(props) {
@@ -13,9 +13,9 @@ export default class MetadataSelector extends React.Component {
             expanded : false,
             loading : false,
             loadedRecords : false,
+            allSelected : false,
             tableProps : this.buildTableProps()
         }
-        this.selectedIds = [];
     }
 
     async fetchMetadata() {
@@ -28,8 +28,7 @@ export default class MetadataSelector extends React.Component {
     }
 
     toggleMetadata = (event) => {
-        if (this.state.loadedRecords)
-        {
+        if (this.state.loadedRecords) {
             this.setState({expanded: !this.state.expanded});
         }
         else {
@@ -38,8 +37,19 @@ export default class MetadataSelector extends React.Component {
         }
     }
 
-    getSelectedRecordsFromLocalStorage(type) {
-        return localStorage.getItem('selectedRecords') ? JSON.parse(localStorage.getItem('selectedRecords'))[type] : {};
+    async setParentSelectedRows(selectedIds) {
+        const { type } = this.props.metadata;
+        this.selectedIds = selectedIds
+        this.props.setSelectedIdsForType(type, selectedIds);
+    }
+
+    getSelectedIds = (type) => {
+        //think really should hold in state whether we've retrieved from local storage yet
+        if (!this.selectedIds || Object.keys(this.selectedIds).length === 0) {
+            this.selectedIds = this.props.getSelectedIdsForType(type);
+        }
+
+        return this.selectedIds;
     }
 
     buildTableProps() {
@@ -49,26 +59,27 @@ export default class MetadataSelector extends React.Component {
             selector : true,
             key : type,
             type : type,
-            setParentSelectedRows : async selectedIds => {
-                this.selectedIds = selectedIds
-                const selectedRecords = []; 
-                records.forEach(record => {
-                    if (selectedIds[record.Id]) {
-                        selectedRecords.push(record);
-                    }
-                }) 
-                //send up to the main parent component
-                this.props.selectRecordsForType(type, selectedRecords);
+            allSelected : false,
+            selectRow : (rowId) => {
+                this.selectedIds[rowId] = !this.selectedIds[rowId];
+                this.setParentSelectedRows(this.selectedIds);    
+            },
+            selectAllRows : () => {
+                tableProps.rows.forEach(row => {
+                    this.selectedIds[row.Id] = !this.state.allSelected;
+                });
+                this.setParentSelectedRows(this.selectedIds);
+                this.setState({allSelected : !this.state.allSelected});
             }
-    
         };
+        
         tableProps.rows = records.map(record => buildSelectorRowForType.call(tableProps, record));
 
         return tableProps;
     }
 
     render() {
-        const { expanded, loading, loadedRecords, tableProps } = this.state;
+        const { expanded, loading, loadedRecords, tableProps, allSelected } = this.state;
         const { type } = this.props.metadata;
 
         return (
@@ -85,7 +96,7 @@ export default class MetadataSelector extends React.Component {
                         
                         </Row>
                         <Col className={`${(expanded && loadedRecords) ? '' : 'd-none'}`}>
-                            <MetadataTable {...tableProps} previouslySelectedIds={() => getSelectedRecords(this.getSelectedRecordsFromLocalStorage(type), tableProps.rows)} />
+                            <MetadataTable {...tableProps} allSelected={allSelected} getSelectedIds={this.getSelectedIds} />
                         </Col>
                     </Col>
                 </Container>

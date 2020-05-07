@@ -38,8 +38,12 @@ export default class OrgReport extends React.Component {
         }
     }
 
-    selectRecordsForType = async (type,records) => {
-        this.selectedRecordsByType[type] = records;
+    setSelectedIdsForType = async (type,selectedIds) => {
+        this.selectedIdsByType[type] = selectedIds;
+    }
+
+    getSelectedIdsForType = (type) => {
+        return (this.selectedIdsByType && this.selectedIdsByType[type]) ? this.selectedIdsByType[type] : {};
     }
 
     handleMetadataNameRetrieval = (metadata, metadataType) => {
@@ -50,7 +54,7 @@ export default class OrgReport extends React.Component {
             metadata.records.forEach((record) => {
                 metadataStore.records.push(record);
             });
-
+ 
             this.setState({
                 metadataTypesForRetrieval : this.state.metadataTypesForRetrieval
             });
@@ -58,38 +62,50 @@ export default class OrgReport extends React.Component {
     }
 
     generateReport = () => {
-        localStorage.setItem('selectedRecords', JSON.stringify(this.selectedRecordsByType));
-        this.setState({ selectedRecordsByType: this.selectedRecordsByType,
-                        showReport : true
-        });
+        localStorage.setItem('selectedRecords', JSON.stringify(this.selectedIdsByType));
+        this.setState({ selectedIdsByType: this.selectedIdsByType, showReport : true});
     }
 
     /*
         Load the previous selections from local storage - obviously need to do client side
     */
     componentDidMount() {
-        this.selectedRecordsByType = localStorage.getItem('selectedRecords') ? JSON.parse(localStorage.getItem('selectedRecords')) : {};
+        this.selectedIdsByType = localStorage.getItem('selectedRecords') ? JSON.parse(localStorage.getItem('selectedRecords')) : {};
     }
 
     getMetadataConfigurator() {
         const { metadataTypesForRetrieval } = this.state;
         return (<Col>
-                    {metadataTypesForRetrieval.map((metadata, index) => <MetadataSelector metadata={metadata} fetchMetadata={this.fetchMetadata}
-                                                                                            selectRecordsForType={this.selectRecordsForType} key={index} />)}
-                    <Row className="mt-1"><Col><Button variant="primary" onClick={this.generateReport}>Generate Report</Button></Col></Row>
+                    {metadataTypesForRetrieval.map((metadata, index) => (
+                        <MetadataSelector metadata={metadata} 
+                                          fetchMetadata={this.fetchMetadata}                                                  
+                                          setSelectedIdsForType={this.setSelectedIdsForType} 
+                                          getSelectedIdsForType={this.getSelectedIdsForType}
+                                          key={index} />
+                    ))}
+                    <Row className="mt-1">
+                        <Col>
+                            <Button variant="primary" onClick={this.generateReport}>Generate Report</Button>
+                        </Col>
+                    </Row>
                 </Col>)
     }
 
     getMetadataReport() {
-        const { selectedRecordsByType } = this.state;
-        const metadataTypes = Object.keys(selectedRecordsByType);
+        const { selectedIdsByType, metadataTypesForRetrieval } = this.state;
+        const metadataTypes = Object.keys(selectedIdsByType);
         return (
             <>
                 <Col>
                     {metadataTypes.map( (metadataType, index) => {
                         const columns = reportColumnHeadersByType[metadataType];
-                        const rows = selectedRecordsByType[metadataType].map(record => buildReportRowForType(metadataType, record));
-
+                        const selectedIds = selectedIdsByType[metadataType];
+                        const rows = [];
+                        metadataTypesForRetrieval
+                            .find(metadataTypeStore => metadataTypeStore.type === metadataType)
+                            .records.forEach(record => {
+                                if (selectedIds[record.Id]) rows.push(buildReportRowForType(metadataType, record));
+                            }); 
                         const props = {rows, columns, key: index, selector: false};
                         return rows && rows.length > 0 ? <MetadataTable {...props} /> : null;
                     })}

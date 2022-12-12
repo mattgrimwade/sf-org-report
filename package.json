@@ -14,7 +14,7 @@
     "bootstrap": "^4.4.1",
     "connect-redis": "^4.0.4",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.1",
     "js-cookie": "^2.2.1",
     "jsforce": "^1.9.3",
